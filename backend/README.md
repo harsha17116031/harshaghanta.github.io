@@ -255,3 +255,24 @@ sam delete
 ```
 
 This will remove the Lambda function, Function URL, and all associated resources.
+
+## Architecture Decisions
+
+### Why Lambda Function URL Instead of API Gateway?
+
+This project uses **Lambda Function URL** instead of API Gateway for several important reasons:
+
+1. **Cost Optimization** - Lambda Function URL is completely free, while API Gateway costs $3.50 per million requests
+2. **Simplicity** - Direct Lambda invocation with less infrastructure to manage
+3. **Performance** - Lower latency (~20-30ms faster) without API Gateway hop
+4. **Sufficient Features** - Built-in CORS, HTTPS, and logging meet all requirements
+
+For a detailed comparison and analysis, see [API Gateway Recommendation](../docs/API_GATEWAY_RECOMMENDATION.md).
+
+**When might you need API Gateway?**
+- Traffic exceeds 100K requests/month and you need caching
+- Need custom domain (e.g., `api.yoursite.com`)
+- Require API keys and usage plans for monetization
+- Need advanced rate limiting and request validation
+
+For this portfolio use case, Lambda Function URL is the optimal choice, providing the same functionality at zero cost with better performance.

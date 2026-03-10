@@ -315,3 +315,18 @@ For questions or issues, please open an issue on GitHub.
 ---
 
 Built with ❤️ using TypeScript, Tailwind CSS, and AWS
+
+## Architecture Decisions
+
+### Backend: Lambda Function URL vs API Gateway
+
+This project deliberately uses **Lambda Function URL** instead of API Gateway because:
+
+- ✅ **Free** - Zero cost vs $3.50 per million requests
+- ✅ **Faster** - Direct invocation without API Gateway overhead (~20-30ms faster)
+- ✅ **Simpler** - Less infrastructure to manage and monitor
+- ✅ **Sufficient** - Built-in CORS, HTTPS, and logging meet all portfolio needs
+
+For a detailed analysis and comparison, see [API Gateway Recommendation](./docs/API_GATEWAY_RECOMMENDATION.md).
+
+**Bottom line:** Lambda Function URL is the right choice for portfolios and low-to-moderate traffic applications. API Gateway is only beneficial at high scale (100K+ requests/month) or when you need advanced features like API keys, custom domains, or response caching.
