@@ -21,23 +21,31 @@
   }
 
   .project-card {
-    @apply rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-950/80 p-5 shadow-xl transition duration-500 hover:-translate-y-2 hover:border-blue-400/40 hover:shadow-2xl hover:shadow-blue-500/20;
+    @apply rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-950/80 p-6 shadow-xl transition-all duration-500 hover:-translate-y-2 hover:border-blue-400/40 hover:shadow-2xl hover:shadow-blue-500/20;
   }
 
-  .project-frame {
-    @apply h-[420px] w-full rounded-xl border border-slate-700/50 bg-slate-900/90;
+  .experience-card {
+    @apply rounded-xl border border-white/10 bg-gradient-to-br from-slate-900/40 to-slate-950/60 p-6 transition-all duration-300 hover:border-blue-400/30 hover:shadow-lg hover:shadow-blue-500/10;
   }
 
   .gradient-pill {
     @apply inline-flex items-center rounded-full border border-blue-400/30 bg-gradient-to-r from-blue-500/20 to-purple-500/20 px-4 py-1 text-xs font-semibold tracking-wide text-blue-200;
   }
 
+  .tech-badge {
+    @apply px-3 py-1 bg-blue-500/10 border border-blue-400/20 rounded-full text-xs text-blue-300 transition-all hover:bg-blue-500/20 hover:border-blue-400/40;
+  }
+
+  .skill-tag {
+    @apply px-3 py-1.5 bg-gradient-to-r from-slate-700/50 to-slate-800/50 border border-white/10 rounded-lg text-sm text-slate-200 transition-all hover:from-blue-500/20 hover:to-purple-500/20 hover:border-blue-400/30 hover:scale-105 hover:shadow-lg;
+  }
+
   .ai-input {
-    @apply w-full rounded-xl border border-slate-600/50 bg-slate-900/80 p-3 text-slate-100 outline-none ring-blue-400/40 placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2;
+    @apply w-full rounded-xl border border-slate-600/50 bg-slate-900/80 p-3 text-slate-100 outline-none ring-blue-400/40 placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 transition;
   }
 
   .ai-button {
-    @apply rounded-full border border-blue-400/40 bg-gradient-to-r from-blue-500/30 to-purple-500/30 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:from-blue-500/50 hover:to-purple-500/50 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply rounded-full border border-blue-400/40 bg-gradient-to-r from-blue-500/30 to-purple-500/30 px-6 py-2 text-sm font-semibold text-blue-100 transition-all hover:from-blue-500/50 hover:to-purple-500/50 hover:shadow-lg hover:shadow-blue-500/30 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .ai-output {
@@ -76,5 +84,64 @@
 
   .scroll-fade.animate-in {
     opacity: 1;
+  }
+}
+
+@layer utilities {
+  /* Custom animations */
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 0.15;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.25;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes pulse-slower {
+    0%, 100% {
+      opacity: 0.15;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.2;
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 8s ease-in-out infinite;
+  }
+
+  .animate-pulse-slower {
+    animation: pulse-slower 10s ease-in-out infinite;
+  }
+
+  .animate-bounce-subtle {
+    animation: bounce-subtle 2s ease-in-out infinite;
+  }
+
+  .animate-blink {
+    animation: blink 1s step-end infinite;
   }
 }
