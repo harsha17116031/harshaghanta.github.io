@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Portfolio AI assistant (Lambda + Bedrock)
+Resources:
+  PortfolioAiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs20.x
+      Handler: src/handler.handler
+      CodeUri: PortfolioAiFunction
+      Timeout: 15
+      MemorySize: 256
+      Environment:
+        Variables:
+          BEDROCK_MODEL_ID: amazon.titan-text-lite-v1
+          ALLOWED_ORIGIN: https://harsha17116031.github.io
+      Policies:
+      - Statement:
+          Effect: Allow
+          Action:
+          - bedrock:InvokeModel
+          Resource: '*'
+    Metadata:
+      SamResourceId: PortfolioAiFunction
+  PortfolioAiFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      TargetFunctionArn:
+        Fn::GetAtt:
+        - PortfolioAiFunction
+        - Arn
+      Cors:
+        AllowOrigins:
+        - https://harsha17116031.github.io
+        AllowMethods:
+        - POST
+        - OPTIONS
+        AllowHeaders:
+        - content-type
+  PortfolioAiFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunctionUrl
+      FunctionName:
+        Ref: PortfolioAiFunction
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+Outputs:
+  PortfolioAiUrl:
+    Description: Public Lambda Function URL
+    Value:
+      Fn::GetAtt:
+      - PortfolioAiFunctionUrl
+      - FunctionUrl
