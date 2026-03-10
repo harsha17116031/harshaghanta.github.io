@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     // Vite options
-    base: './',
+    base: '/harshaghanta.github.io/',
 
     // Only expose variables prefixed with VITE_ to the client
     // This prevents accidentally exposing sensitive backend variables
