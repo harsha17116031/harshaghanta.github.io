@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# AWS SAM build artifacts
+.aws-sam/
+
+# Environment variables (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+samconfig.toml
+
+# Package manager
+package-lock.json
+yarn.lock
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+.DS_Store
