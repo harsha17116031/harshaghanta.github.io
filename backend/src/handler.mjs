@@ -11,10 +11,37 @@ const corsHeaders = {
 
 const portfolioContext = `
 Portfolio context:
-- Name: [Your Name]
-- Roles: [Your Role 1] | [Your Role 2]
-- Project 1: XpressCV (AI Resume Generation Tool) - https://xpresscv.com
-- Project 2: OckraTech (Financial Trading Platform) - https://ocktratech.com
+- Name: Harsha Vardhan Reddy
+- Current Role: Senior Software Developer at Anthem Inc. (Feb 2024 - Present)
+- Previous Roles: Software Developer at Leidos (Jul 2023 - Dec 2023), Full Stack Developer at Ocktra Tech (Jul 2020 - Jul 2022)
+- Education: MS in Computer Science from UT Dallas (2022-2023), BTech in Information Technology from NIT Raipur, India (2016-2020)
+- Contact: 940-843-1600, ghanta.17116031@gmail.com, hvg220000@utdallas.edu
+- Certifications: AWS Certified AI Practitioner
+- Key Skills: React, Node.js, TypeScript, Python, AWS (S3, Lambda, ECS, CDK), PostgreSQL, MongoDB, Kafka, Docker, CI/CD
+- Current Work at Anthem:
+  * Provider Portal: Led development of modular React/Node.js platform for case management
+  * Claims Workflow: Decomposed legacy systems into domain-driven microservices with OAuth2
+  * Event Streaming: Designed Kafka-based event-driven architecture replacing Redis Pub/Sub
+  * AI Workflow Automation: Built human-in-the-loop document processing workflows
+  * High Performance APIs: Optimized RESTful APIs with PostgreSQL and MongoDB
+  * Infrastructure: Managed AWS infrastructure using CDK (TypeScript)
+- Previous Experience at Leidos:
+  * Built modular Node.js services with layered patterns
+  * Implemented Kafka-driven async processing
+  * Created Redis-based distributed locking for concurrency
+  * Established versioned REST APIs with RBAC
+  * Optimized React dashboards with lazy loading and memoization
+- Previous Experience at Ocktra Tech:
+  * Built low-latency market data services
+  * Developed secure order processing APIs
+  * Implemented event-driven alerting framework
+  * Designed portfolio analytics backend
+  * Optimized React trading dashboards
+- Project 1: XpressCV (AI Resume Generation Tool) - https://xpresscv.com - AI-driven resume generation
+- Project 2: OckraTech (Financial Trading Platform) - https://ocktratech.com - Real-time trading platform
+- Academic Projects:
+  * Predictive Modeling for Emerging Trends: NLP framework with transformer models (LSTM, BERTopic)
+  * Fake News Prediction: ML model with SVM, Naive Bayes, Logistic Regression (92% accuracy)
 `;
 
 const bedrockModelId = process.env.BEDROCK_MODEL_ID || 'amazon.titan-text-lite-v1';
