@@ -1,0 +1,10 @@
+{
+  "name": "portfolio-ai-backend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "AWS Lambda + Bedrock backend for portfolio AI assistant",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "3.540.0"
+  }
+}

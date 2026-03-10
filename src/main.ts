@@ -7,6 +7,11 @@ type Project = {
   summary: string;
 };
 
+type AiResponse = {
+  answer?: string;
+  error?: string;
+};
+
 const projects: Project[] = [
   {
     name: 'XpressCV',
@@ -24,6 +29,7 @@ const projects: Project[] = [
   }
 ];
 
+const aiApiUrl = import.meta.env.VITE_AI_API_URL as string | undefined;
 const app = document.querySelector<HTMLDivElement>('#app');
 
 if (!app) {
@@ -73,6 +79,78 @@ app.innerHTML = `
             .join('')}
         </div>
       </div>
+
+      <div class="glass-card">
+        <span class="gradient-pill mb-4">AI Assistant (Lambda + Bedrock)</span>
+        <h2 class="section-title">Ask AI for deeper project details</h2>
+        <p class="section-subtitle">Cost-effective serverless design: Lambda function URL + Bedrock.</p>
+        <div class="grid gap-3">
+          <label for="ai-question" class="text-sm font-semibold text-indigo-100">Your question</label>
+          <textarea id="ai-question" class="ai-input" rows="3" placeholder="Tell me more about how your projects use AI and trading workflows."></textarea>
+          <div class="flex flex-wrap items-center gap-3">
+            <button id="ask-ai-btn" class="ai-button" type="button">Ask AI Assistant</button>
+            <span id="ai-hint" class="text-xs text-indigo-100/70">Set <code>VITE_AI_API_URL</code> to connect your deployed Lambda endpoint.</span>
+          </div>
+          <pre id="ai-answer" class="ai-output">AI response will appear here.</pre>
+        </div>
+      </div>
     </section>
   </main>
 `;
+
+const aiQuestion = document.querySelector<HTMLTextAreaElement>('#ai-question');
+const aiButton = document.querySelector<HTMLButtonElement>('#ask-ai-btn');
+const aiAnswer = document.querySelector<HTMLPreElement>('#ai-answer');
+
+const setAiAnswer = (text: string): void => {
+  if (aiAnswer) {
+    aiAnswer.textContent = text;
+  }
+};
+
+const askAi = async (): Promise<void> => {
+  if (!aiQuestion || !aiButton) {
+    return;
+  }
+
+  const question = aiQuestion.value.trim();
+  if (!question) {
+    setAiAnswer('Please enter a question first.');
+    return;
+  }
+
+  if (!aiApiUrl) {
+    setAiAnswer('Backend is not configured yet. Set VITE_AI_API_URL in your .env file.');
+    return;
+  }
+
+  aiButton.disabled = true;
+  aiButton.textContent = 'Thinking...';
+  setAiAnswer('Contacting Lambda + Bedrock...');
+
+  try {
+    const response = await fetch(aiApiUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ question })
+    });
+
+    const payload = (await response.json()) as AiResponse;
+    if (!response.ok) {
+      throw new Error(payload.error || 'Request failed');
+    }
+
+    setAiAnswer(payload.answer || 'No answer returned.');
+  } catch (error) {
+    setAiAnswer(`AI request failed: ${error instanceof Error ? error.message : 'unknown error'}`);
+  } finally {
+    aiButton.disabled = false;
+    aiButton.textContent = 'Ask AI Assistant';
+  }
+};
+
+if (aiButton) {
+  aiButton.addEventListener('click', () => {
+    void askAi();
+  });
+}

@@ -31,4 +31,16 @@
   .gradient-pill {
     @apply inline-flex items-center rounded-full border border-indigo-200/40 bg-gradient-to-r from-indigo-500/25 to-fuchsia-500/25 px-4 py-1 text-xs font-semibold tracking-wide text-indigo-100;
   }
+
+  .ai-input {
+    @apply w-full rounded-xl border border-indigo-200/30 bg-slate-900/70 p-3 text-slate-100 outline-none ring-indigo-300/40 placeholder:text-slate-400 focus:ring-2;
+  }
+
+  .ai-button {
+    @apply rounded-full border border-indigo-200/40 bg-indigo-500/20 px-4 py-2 text-sm font-semibold text-indigo-100 transition hover:bg-indigo-500/40 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .ai-output {
+    @apply min-h-28 whitespace-pre-wrap rounded-xl border border-indigo-200/30 bg-slate-950/70 p-4 text-sm text-slate-200;
+  }
 }
