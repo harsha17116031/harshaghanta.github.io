@@ -4,12 +4,12 @@
 
 @layer components {
   .glass-card {
-    @apply relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-xl md:p-8;
+    @apply relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-800/40 via-slate-900/30 to-slate-950/40 p-6 shadow-2xl backdrop-blur-xl md:p-8;
   }
 
   .glass-card::before {
     content: '';
-    @apply absolute inset-0 -z-10 bg-gradient-to-br from-white/25 via-indigo-200/10 to-fuchsia-200/10;
+    @apply absolute inset-0 -z-10 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10;
   }
 
   .section-title {
@@ -17,30 +17,64 @@
   }
 
   .section-subtitle {
-    @apply mb-6 text-sm text-indigo-100/80 md:text-base;
+    @apply mb-6 text-sm text-slate-300/90 md:text-base;
   }
 
   .project-card {
-    @apply rounded-2xl border border-white/20 bg-slate-950/35 p-5 shadow-xl transition duration-300 hover:-translate-y-1 hover:border-indigo-300/70 hover:shadow-indigo-500/30;
+    @apply rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-950/80 p-5 shadow-xl transition duration-500 hover:-translate-y-2 hover:border-blue-400/40 hover:shadow-2xl hover:shadow-blue-500/20;
   }
 
   .project-frame {
-    @apply h-[420px] w-full rounded-xl border border-indigo-200/30 bg-slate-900/90;
+    @apply h-[420px] w-full rounded-xl border border-slate-700/50 bg-slate-900/90;
   }
 
   .gradient-pill {
-    @apply inline-flex items-center rounded-full border border-indigo-200/40 bg-gradient-to-r from-indigo-500/25 to-fuchsia-500/25 px-4 py-1 text-xs font-semibold tracking-wide text-indigo-100;
+    @apply inline-flex items-center rounded-full border border-blue-400/30 bg-gradient-to-r from-blue-500/20 to-purple-500/20 px-4 py-1 text-xs font-semibold tracking-wide text-blue-200;
   }
 
   .ai-input {
-    @apply w-full rounded-xl border border-indigo-200/30 bg-slate-900/70 p-3 text-slate-100 outline-none ring-indigo-300/40 placeholder:text-slate-400 focus:ring-2;
+    @apply w-full rounded-xl border border-slate-600/50 bg-slate-900/80 p-3 text-slate-100 outline-none ring-blue-400/40 placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2;
   }
 
   .ai-button {
-    @apply rounded-full border border-indigo-200/40 bg-indigo-500/20 px-4 py-2 text-sm font-semibold text-indigo-100 transition hover:bg-indigo-500/40 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply rounded-full border border-blue-400/40 bg-gradient-to-r from-blue-500/30 to-purple-500/30 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:from-blue-500/50 hover:to-purple-500/50 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .ai-output {
-    @apply min-h-28 whitespace-pre-wrap rounded-xl border border-indigo-200/30 bg-slate-950/70 p-4 text-sm text-slate-200;
+    @apply min-h-28 whitespace-pre-wrap rounded-xl border border-slate-600/50 bg-slate-900/80 p-4 text-sm text-slate-200;
+  }
+
+  /* Apple-style scroll animations */
+  .scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .scroll-animate.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scroll-scale {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .scroll-scale.animate-in {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .scroll-fade {
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .scroll-fade.animate-in {
+    opacity: 1;
   }
 }
