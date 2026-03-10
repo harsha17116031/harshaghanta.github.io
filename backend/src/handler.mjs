@@ -24,6 +24,29 @@ ${portfolioContext}
 User question: ${question}
 `;
 
+const parseBedrockBody = (rawBody) => {
+  try {
+    return JSON.parse(new TextDecoder().decode(rawBody));
+  } catch {
+    throw new Error('Unable to parse Bedrock response body');
+  }
+};
+
+const extractAnswer = (decoded) => {
+  // Titan text models return { results: [{ outputText: string }] }.
+  const titanAnswer = decoded?.results?.[0]?.outputText;
+  if (typeof titanAnswer === 'string' && titanAnswer.trim()) {
+    return titanAnswer.trim();
+  }
+
+  // Future fallback for models that use { outputText: string }.
+  if (typeof decoded?.outputText === 'string' && decoded.outputText.trim()) {
+    return decoded.outputText.trim();
+  }
+
+  throw new Error(`Unsupported response format for model ${bedrockModelId}`);
+};
+
 export const handler = async (event) => {
   if (event.requestContext?.http?.method === 'OPTIONS') {
     return {
@@ -59,14 +82,13 @@ export const handler = async (event) => {
     });
 
     const result = await client.send(command);
-    const decoded = JSON.parse(new TextDecoder().decode(result.body));
+    const decoded = parseBedrockBody(result.body);
+    const answer = extractAnswer(decoded);
 
     return {
       statusCode: 200,
       headers: corsHeaders,
-      body: JSON.stringify({
-        answer: decoded.results?.[0]?.outputText?.trim() || 'No response generated.'
-      })
+      body: JSON.stringify({ answer })
     };
   } catch (error) {
     return {
