@@ -161,7 +161,6 @@ app.innerHTML = `
                 <h3 class="text-xl font-bold text-blue-100">Senior Software Developer</h3>
                 <p class="text-sm text-slate-400 mt-1">Anthem Inc.</p>
               </div>
-              <span class="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-200">Feb 2024 - Present</span>
             </div>
             <p class="mt-3 text-sm text-slate-300">Leading development of enterprise healthcare solutions, focusing on scalability and performance optimization.</p>
           </div>
@@ -171,7 +170,6 @@ app.innerHTML = `
                 <h3 class="text-xl font-bold text-blue-100">Software Developer</h3>
                 <p class="text-sm text-slate-400 mt-1">Leidos</p>
               </div>
-              <span class="rounded-full bg-purple-500/20 px-3 py-1 text-xs font-semibold text-purple-200">Jul 2023 - Dec 2023</span>
             </div>
             <p class="mt-3 text-sm text-slate-300">Developed secure government solutions with focus on reliability and compliance.</p>
           </div>
@@ -181,7 +179,6 @@ app.innerHTML = `
                 <h3 class="text-xl font-bold text-blue-100">Full Stack Developer</h3>
                 <p class="text-sm text-slate-400 mt-1">Ocktra Tech</p>
               </div>
-              <span class="rounded-full bg-pink-500/20 px-3 py-1 text-xs font-semibold text-pink-200">Jul 2020 - Jul 2022</span>
             </div>
             <p class="mt-3 text-sm text-slate-300">Built real-time trading platform with WebSockets and high-performance data processing.</p>
           </div>
