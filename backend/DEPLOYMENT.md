@@ -8,11 +8,58 @@ This backend provides two main services:
 
 ## Architecture
 
+### Why API Gateway (Not Just Lambda Function URLs)?
+
+**The portfolio uses API Gateway as the primary architecture for several important reasons:**
+
+1. **Professional Production Setup**
+   - API Gateway provides enterprise-grade features: throttling, caching, request validation
+   - Better suited for production portfolios that may scale
+   - Provides centralized management of multiple endpoints (`/ai` and `/location`)
+
+2. **Enhanced CORS Management**
+   - API Gateway handles CORS at the infrastructure level (template.yaml Globals)
+   - Automatic OPTIONS preflight responses
+   - Consistent CORS across all endpoints
+   - Reduces potential CORS issues in browsers
+
+3. **Better Monitoring & Security**
+   - CloudWatch integration for detailed API metrics
+   - Request/response logging
+   - AWS WAF integration available if needed
+   - Rate limiting and throttling built-in
+
+4. **Future Extensibility**
+   - Easy to add new endpoints without changing architecture
+   - Can add API keys, custom domains, or usage plans later
+   - Supports request/response transformation
+
+5. **Cost Consideration**
+   - API Gateway costs ~$3.50 per million requests (free tier: 1M requests/month)
+   - Lambda Function URLs are completely free but lack features above
+   - For a portfolio with low traffic, both are essentially free
+   - **Note:** The template maintains Lambda Function URLs for backward compatibility
+
+**Current Architecture:**
+```
+Frontend (GitHub Pages)
+    ↓ HTTPS
+API Gateway REST API (/prod stage)
+    ↓
+    ├─ POST /ai → PortfolioAiFunction → Amazon Bedrock (Titan)
+    └─ GET /location → LocationDetectionFunction → IP Geolocation APIs
+```
+
+**Legacy Support:**
+- Lambda Function URLs are still deployed but marked as deprecated
+- This maintains backward compatibility if anyone bookmarked the old URL
+- New deployments should use API Gateway endpoints
+
 - **API Gateway**: Single REST API with two endpoints (`/ai` and `/location`)
 - **Lambda Functions**: Two Node.js 20.x functions
 - **AI Service**: Amazon Bedrock (Titan Text Lite v1)
 - **Location Service**: Free IP geolocation APIs (ipapi.co and ip-api.com)
-- **CORS**: Configured for https://harsha17116031.github.io
+- **CORS**: Properly configured at both API Gateway and Lambda levels
 
 ## Prerequisites
 
@@ -143,6 +190,181 @@ Detects visitor's location from IP address.
   "longitude": -122.4194
 }
 ```
+
+## Cost Estimates
+
+## CORS Configuration & Troubleshooting
+
+### Understanding CORS in This Setup
+
+**CORS (Cross-Origin Resource Sharing)** is configured at two levels for maximum reliability:
+
+1. **API Gateway Level** (template.yaml Globals section)
+   - Handles CORS at infrastructure level
+   - Automatically responds to OPTIONS preflight requests
+   - Configured for: `https://harsha17116031.github.io`
+   - Methods: GET, POST, OPTIONS
+   - Headers: `content-type`, `x-requested-with`
+
+2. **Lambda Function Level** (handler.mjs and location-handler.mjs)
+   - Adds CORS headers to all responses
+   - Handles edge cases where API Gateway CORS isn't sufficient
+   - Includes `access-control-max-age` for browser caching (24 hours)
+
+### CORS Headers Explained
+
+```javascript
+const corsHeaders = {
+  'access-control-allow-origin': 'https://harsha17116031.github.io',  // Only your domain
+  'access-control-allow-methods': 'OPTIONS,POST',  // Allowed HTTP methods
+  'access-control-allow-headers': 'content-type,x-requested-with',  // Allowed request headers
+  'access-control-max-age': '86400'  // Cache preflight for 24 hours
+};
+```
+
+### Common CORS Issues & Solutions
+
+#### Issue 1: "No 'Access-Control-Allow-Origin' header is present"
+
+**Cause:** The API is not returning CORS headers.
+
+**Solutions:**
+1. Verify `ALLOWED_ORIGIN` environment variable in template.yaml matches your domain exactly
+2. Check that both Lambda functions include CORS headers in ALL responses
+3. Ensure API Gateway CORS is configured in Globals section
+4. Redeploy with `sam build && sam deploy`
+
+**Test:**
+```bash
+curl -v -X OPTIONS https://your-api.execute-api.us-east-1.amazonaws.com/prod/ai \
+  -H "Origin: https://harsha17116031.github.io" \
+  -H "Access-Control-Request-Method: POST"
+```
+
+Should return:
+```
+< access-control-allow-origin: https://harsha17116031.github.io
+< access-control-allow-methods: OPTIONS,POST
+< HTTP/1.1 204 No Content
+```
+
+#### Issue 2: "CORS policy: The value of 'Access-Control-Allow-Origin' must not be wildcard '*'"
+
+**Cause:** Using wildcard (`*`) with credentials or in strict browsers.
+
+**Solution:** Already fixed! We use the specific origin:
+```yaml
+Environment:
+  Variables:
+    ALLOWED_ORIGIN: https://harsha17116031.github.io
+```
+
+#### Issue 3: Preflight (OPTIONS) requests failing
+
+**Cause:** API Gateway or Lambda not handling OPTIONS correctly.
+
+**Verification:**
+- Both handler.mjs and location-handler.mjs check for OPTIONS method
+- Return 204 with CORS headers and empty body
+- API Gateway Globals configuration handles this automatically
+
+**Current Implementation:**
+```javascript
+const method = event.requestContext?.http?.method || event.httpMethod;
+if (method === 'OPTIONS') {
+  return {
+    statusCode: 204,
+    headers: corsHeaders,
+    body: ''
+  };
+}
+```
+
+#### Issue 4: Works locally but not in production
+
+**Causes & Solutions:**
+
+1. **Environment Variables:**
+   - Verify `.env` has correct VITE_AI_API_URL and VITE_LOCATION_API_URL
+   - Rebuild frontend: `npm run build`
+   - Ensure GitHub Pages is serving latest build
+
+2. **Domain Mismatch:**
+   - Production uses `https://harsha17116031.github.io`
+   - Local uses `http://localhost:5173`
+   - For local testing, temporarily change ALLOWED_ORIGIN to `*` in template.yaml
+   - **Remember to change back before production deploy!**
+
+3. **Mixed Content:**
+   - Ensure all URLs use HTTPS (not HTTP)
+   - API Gateway URLs are always HTTPS
+
+#### Issue 5: CORS works in browser but not in testing tools
+
+**Explanation:** This is normal! CORS is a browser security feature.
+- Tools like Postman, curl, or Insomnia bypass CORS
+- If they work but browser doesn't, it's definitely a CORS configuration issue
+- Use browser DevTools Network tab to see actual CORS headers
+
+### Testing CORS Properly
+
+**1. Browser DevTools (Best Method):**
+```javascript
+// Open browser console on https://harsha17116031.github.io
+fetch('https://your-api.execute-api.us-east-1.amazonaws.com/prod/ai', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify({ question: 'test' })
+})
+.then(r => r.json())
+.then(console.log)
+.catch(console.error);
+```
+
+**2. Check Network Tab:**
+- Look for OPTIONS request (preflight)
+- Verify response headers include `access-control-allow-origin`
+- Check status code is 204 for OPTIONS, 200 for POST/GET
+
+**3. Command Line (Simulating Browser):**
+```bash
+# Test preflight
+curl -v -X OPTIONS https://your-api/prod/ai \
+  -H "Origin: https://harsha17116031.github.io" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: content-type"
+
+# Test actual request
+curl -v -X POST https://your-api/prod/ai \
+  -H "Origin: https://harsha17116031.github.io" \
+  -H "Content-Type: application/json" \
+  -d '{"question":"test"}'
+```
+
+### CORS Best Practices Implemented
+
+✅ **Specific Origin:** Using exact domain instead of wildcard
+✅ **Preflight Caching:** 24-hour cache to reduce OPTIONS requests
+✅ **Dual-Level CORS:** Both API Gateway and Lambda handle CORS
+✅ **Backward Compatibility:** Both Lambda URL and API Gateway work
+✅ **Error Responses:** CORS headers included even in error responses (500, 400)
+✅ **Multiple Methods:** Handles both legacy (`httpMethod`) and modern (`requestContext.http.method`) event formats
+
+### When to Use Lambda Function URL vs API Gateway
+
+**Use Lambda Function URL (Legacy) When:**
+- You need absolute minimum cost (100% free)
+- Simple single-function APIs
+- No need for advanced features
+- **Current status:** Deprecated but maintained for backward compatibility
+
+**Use API Gateway (Recommended) When:**
+- Production portfolios (like this one)
+- Need better CORS management
+- Want monitoring and logging
+- May add more endpoints later
+- Need rate limiting or caching
+- **Current status:** Primary architecture for this portfolio
 
 ## Cost Estimates
 

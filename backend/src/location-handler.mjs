@@ -3,7 +3,8 @@ const corsHeaders = {
   'content-type': 'application/json',
   'access-control-allow-origin': process.env.ALLOWED_ORIGIN || '*',
   'access-control-allow-methods': 'OPTIONS,GET',
-  'access-control-allow-headers': 'content-type'
+  'access-control-allow-headers': 'content-type,x-requested-with',
+  'access-control-max-age': '86400' // Cache preflight for 24 hours
 };
 
 /**
@@ -80,11 +81,13 @@ const extractClientIP = (event) => {
 };
 
 export const handler = async (event) => {
-  // Handle CORS preflight
-  if (event.requestContext?.http?.method === 'OPTIONS') {
+  // Handle CORS preflight (OPTIONS) requests
+  const method = event.requestContext?.http?.method || event.httpMethod;
+  if (method === 'OPTIONS') {
     return {
       statusCode: 204,
-      headers: corsHeaders
+      headers: corsHeaders,
+      body: ''
     };
   }
 
