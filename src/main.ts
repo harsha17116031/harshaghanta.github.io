@@ -14,6 +14,19 @@ type AiResponse = {
   error?: string;
 };
 
+type LocationResponse = {
+  ip?: string;
+  city?: string;
+  region?: string;
+  country?: string;
+  countryCode?: string;
+  timezone?: string;
+  latitude?: number;
+  longitude?: number;
+  error?: string;
+  message?: string;
+};
+
 const projects: Project[] = [
   {
     name: 'XpressCV',
@@ -36,6 +49,7 @@ const projects: Project[] = [
 ];
 
 const aiApiUrl = import.meta.env.VITE_AI_API_URL as string | undefined;
+const locationApiUrl = import.meta.env.VITE_LOCATION_API_URL as string | undefined;
 const app = document.querySelector<HTMLDivElement>('#app');
 
 if (!app) {
@@ -96,6 +110,52 @@ app.innerHTML = `
         </div>
       </div>
     </div>
+
+    <!-- Greeting Bot Modal -->
+    <div id="greeting-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div class="mx-4 w-full max-w-md rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/95 via-slate-900/95 to-slate-950/95 p-6 shadow-2xl backdrop-blur-xl">
+        <div class="mb-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">👋</span>
+            <div>
+              <h3 class="text-xl font-bold text-white">Hello, Visitor!</h3>
+              <p class="text-sm text-slate-400" id="greeting-location">Detecting your location...</p>
+            </div>
+          </div>
+          <button id="greeting-close-btn" class="rounded-full p-2 text-slate-400 hover:bg-white/5 hover:text-white transition">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div id="greeting-message" class="text-slate-200 space-y-2">
+            <p>Welcome to my portfolio! I'm <strong>Harsha Vardhan Reddy</strong>, a Senior Software Developer passionate about building scalable cloud solutions.</p>
+            <p class="text-sm text-slate-300">I love experimenting with cutting-edge technologies like:</p>
+            <ul class="text-sm text-slate-300 list-disc list-inside space-y-1 ml-2">
+              <li>AI/ML integrations (like this chatbot!)</li>
+              <li>Cloud-native architectures on AWS</li>
+              <li>Real-time data processing with Kafka</li>
+              <li>Modern full-stack development</li>
+            </ul>
+            <p class="text-sm text-slate-400 mt-3">Feel free to explore my projects, experience, and don't hesitate to reach out!</p>
+          </div>
+          <div class="flex gap-3">
+            <button id="greeting-ai-btn" class="flex-1 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/30 to-purple-500/30 border border-blue-400/40 text-sm font-semibold text-blue-100 hover:from-blue-500/50 hover:to-purple-500/50 transition">
+              💬 Ask AI About Me
+            </button>
+            <button id="greeting-explore-btn" class="flex-1 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-semibold text-slate-200 hover:bg-white/10 transition">
+              🚀 Explore Portfolio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Greeting Bot Floating Button (bottom-right corner) -->
+    <button id="greeting-float-btn" class="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center">
+      <span class="text-2xl">👋</span>
+    </button>
 
     <!-- Hero Section -->
     <header class="scroll-fade relative px-6 pt-32 pb-20 text-center md:pt-40 md:pb-24">
@@ -423,6 +483,131 @@ const askAi = async (): Promise<void> => {
 if (aiButton) {
   aiButton.addEventListener('click', () => {
     void askAi();
+  });
+}
+
+// Greeting Bot functionality
+const greetingModal = document.querySelector<HTMLDivElement>('#greeting-modal');
+const greetingFloatBtn = document.querySelector<HTMLButtonElement>('#greeting-float-btn');
+const greetingCloseBtn = document.querySelector<HTMLButtonElement>('#greeting-close-btn');
+const greetingAiBtn = document.querySelector<HTMLButtonElement>('#greeting-ai-btn');
+const greetingExploreBtn = document.querySelector<HTMLButtonElement>('#greeting-explore-btn');
+const greetingLocationEl = document.querySelector<HTMLParagraphElement>('#greeting-location');
+
+const GREETING_STORAGE_KEY = 'portfolio_greeting_shown';
+
+const closeGreetingModal = (): void => {
+  if (greetingModal) {
+    greetingModal.classList.add('hidden');
+    greetingModal.classList.remove('flex');
+  }
+};
+
+const showGreetingModal = (): void => {
+  if (greetingModal) {
+    greetingModal.classList.remove('hidden');
+    greetingModal.classList.add('flex');
+  }
+};
+
+// Fetch visitor location and update greeting
+const fetchAndDisplayLocation = async (): Promise<void> => {
+  if (!locationApiUrl) {
+    if (greetingLocationEl) {
+      greetingLocationEl.textContent = 'Welcome to my portfolio!';
+    }
+    return;
+  }
+
+  try {
+    const response = await fetch(locationApiUrl, {
+      method: 'GET',
+      headers: { 'content-type': 'application/json' }
+    });
+
+    if (response.ok) {
+      const data = (await response.json()) as LocationResponse;
+
+      if (greetingLocationEl) {
+        if (data.city && data.country) {
+          greetingLocationEl.textContent = `Greetings from ${data.city}, ${data.country}! 🌍`;
+        } else if (data.country) {
+          greetingLocationEl.textContent = `Greetings from ${data.country}! 🌍`;
+        } else if (data.message) {
+          greetingLocationEl.textContent = data.message;
+        } else {
+          greetingLocationEl.textContent = 'Welcome to my portfolio!';
+        }
+      }
+    } else {
+      if (greetingLocationEl) {
+        greetingLocationEl.textContent = 'Welcome to my portfolio!';
+      }
+    }
+  } catch (error) {
+    console.log('Location detection unavailable:', error);
+    if (greetingLocationEl) {
+      greetingLocationEl.textContent = 'Welcome to my portfolio!';
+    }
+  }
+};
+
+// Check if greeting should be shown (first visit in this session)
+const shouldShowGreeting = (): boolean => {
+  return !sessionStorage.getItem(GREETING_STORAGE_KEY);
+};
+
+// Mark greeting as shown
+const markGreetingShown = (): void => {
+  sessionStorage.setItem(GREETING_STORAGE_KEY, 'true');
+};
+
+// Auto-show greeting on first visit
+if (shouldShowGreeting()) {
+  // Fetch location first
+  void fetchAndDisplayLocation();
+
+  // Show greeting after a short delay (for better UX)
+  setTimeout(() => {
+    showGreetingModal();
+    markGreetingShown();
+  }, 1500);
+}
+
+// Event listeners for greeting bot
+if (greetingFloatBtn) {
+  greetingFloatBtn.addEventListener('click', () => {
+    void fetchAndDisplayLocation();
+    showGreetingModal();
+  });
+}
+
+if (greetingCloseBtn) {
+  greetingCloseBtn.addEventListener('click', closeGreetingModal);
+}
+
+if (greetingAiBtn) {
+  greetingAiBtn.addEventListener('click', () => {
+    closeGreetingModal();
+    toggleAiModal();
+  });
+}
+
+if (greetingExploreBtn) {
+  greetingExploreBtn.addEventListener('click', () => {
+    closeGreetingModal();
+    const projectsSection = document.querySelector('#projects');
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+}
+
+if (greetingModal) {
+  greetingModal.addEventListener('click', (e) => {
+    if (e.target === greetingModal) {
+      closeGreetingModal();
+    }
   });
 }
 

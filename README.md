@@ -1,6 +1,6 @@
 # Portfolio Website - TypeScript + Tailwind + AWS
 
-A modern, performant portfolio website with an AI-powered assistant backend.
+A modern, performant portfolio website with AI-powered assistant and location-aware greeting bot.
 
 ## 🏗️ Architecture
 
@@ -9,16 +9,26 @@ A modern, performant portfolio website with an AI-powered assistant backend.
 │  Frontend (Vite + TypeScript)      │
 │  - Tailwind CSS                     │
 │  - Smooth scroll animations         │
+│  - Greeting bot with location       │
+│  - AI chat assistant                │
 │  - GitHub Pages deployment          │
 └────────────┬────────────────────────┘
-             │ HTTPS POST
+             │ HTTPS (GET/POST)
              ↓
 ┌─────────────────────────────────────┐
-│  Backend (AWS Lambda + Bedrock)    │
-│  - Serverless, pay-per-use          │
-│  - AI-powered Q&A assistant         │
-│  - CORS-protected endpoint          │
-└─────────────────────────────────────┘
+│  API Gateway (REST API)            │
+│  - /ai endpoint (POST)              │
+│  - /location endpoint (GET)         │
+│  - CORS-protected                   │
+└────────────┬────────────────────────┘
+             │
+    ┌────────┴────────┐
+    ↓                 ↓
+┌─────────────┐  ┌──────────────────┐
+│  Lambda:    │  │  Lambda:         │
+│  AI Chat    │  │  Location        │
+│  (Bedrock)  │  │  (IP Geo API)    │
+└─────────────┘  └──────────────────┘
 ```
 
 ## 🚀 Quick Start
@@ -51,10 +61,11 @@ npm install
 cp .env.example .env
 ```
 
-Edit `.env` and add your backend URL (or leave empty for local development without AI features):
+Edit `.env` and add your backend URLs (or leave empty for local development without AI features):
 
 ```bash
-VITE_AI_API_URL=https://your-lambda-url.lambda-url.us-east-1.on.aws/
+VITE_AI_API_URL=https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/ai
+VITE_LOCATION_API_URL=https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/location
 ```
 
 4. **Run development server**
@@ -75,18 +86,17 @@ The production-ready files will be in the `dist/` directory.
 
 ### Backend Setup (Optional)
 
-The AI assistant feature requires a backend deployment. See [backend/README.md](./backend/README.md) for detailed instructions.
+The AI assistant and greeting bot features require a backend deployment. See [backend/DEPLOYMENT.md](./backend/DEPLOYMENT.md) for detailed instructions.
 
 Quick backend deployment:
 
 ```bash
 cd backend
-npm install
 sam build
 sam deploy --guided
 ```
 
-After deployment, copy the `PortfolioAiUrl` output and set it in your frontend `.env` file.
+After deployment, copy the API endpoints from the outputs and set them in your frontend `.env` file.
 
 ## 📁 Project Structure
 
@@ -95,11 +105,12 @@ After deployment, copy the `PortfolioAiUrl` output and set it in your frontend `
 ├── src/                    # Frontend source code
 │   ├── main.ts            # Application entry point
 │   └── style.css          # Tailwind components & animations
-├── backend/               # Backend Lambda function
+├── backend/               # Backend Lambda functions
 │   ├── src/
-│   │   └── handler.mjs    # Lambda handler
-│   ├── template.yaml      # AWS SAM template
-│   ├── .env.example       # Backend env template
+│   │   ├── handler.mjs           # AI chat Lambda handler
+│   │   └── location-handler.mjs  # Location detection handler
+│   ├── template.yaml      # AWS SAM template (API Gateway)
+│   ├── DEPLOYMENT.md      # Deployment guide
 │   └── README.md          # Backend documentation
 ├── dist/                  # Build output (gitignored)
 ├── .env                   # Environment variables (gitignored)
@@ -122,7 +133,8 @@ After deployment, copy the `PortfolioAiUrl` output and set it in your frontend `
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `VITE_AI_API_URL` | Lambda Function URL | `https://abc123.lambda-url.us-east-1.on.aws/` |
+| `VITE_AI_API_URL` | AI Assistant API endpoint | `https://abc123.execute-api.us-east-1.amazonaws.com/prod/ai` |
+| `VITE_LOCATION_API_URL` | Location Detection API endpoint | `https://abc123.execute-api.us-east-1.amazonaws.com/prod/location` |
 
 **Important**: Only `VITE_*` prefixed variables are accessible in the browser. Other variables remain server-side only.
 
@@ -143,15 +155,21 @@ Configured in `backend/template.yaml`:
 - ✅ Apple-style scroll animations
 - ✅ Responsive design
 - ✅ Glass-morphism UI components
-- ✅ Project showcase with live iframes
+- ✅ **Location-aware greeting bot** (auto-shows on first visit)
+- ✅ **Floating greeting button** (bottom-right corner)
+- ✅ AI-powered chat assistant
+- ✅ Project showcase
 - ✅ Environment variable validation
 
 ### Backend
-- ✅ AWS Lambda serverless function
-- ✅ Amazon Bedrock AI integration
+- ✅ **API Gateway** with REST API
+- ✅ **Two Lambda functions:**
+  - AI Chat (Amazon Bedrock integration)
+  - Location Detection (IP geolocation)
 - ✅ CORS protection
-- ✅ Cost-optimized (< $1/month for low traffic)
+- ✅ Cost-optimized (< $5/month for low traffic)
 - ✅ Infrastructure as Code (SAM)
+- ✅ Backward compatible (Legacy Lambda Function URL)
 
 ## 🚢 Deployment
 
@@ -179,7 +197,7 @@ Go to Repository Settings → Pages → Source: `gh-pages` branch
 
 ### Deploy Backend to AWS
 
-See [backend/README.md](./backend/README.md) for complete instructions.
+See [backend/DEPLOYMENT.md](./backend/DEPLOYMENT.md) for complete instructions.
 
 ## 🔧 Development
 
@@ -241,11 +259,13 @@ npm run build
 - **GitHub Pages**: Free for public repositories
 
 ### Backend (estimated for low traffic)
-- **Lambda**: Free tier (1M requests/month) - $0
-- **Bedrock**: ~$0.50/month (light usage)
-- **Data Transfer**: Negligible
+- **API Gateway**: $3.50 per million requests (first 1M requests free for 12 months)
+- **Lambda (AI)**: ~$0.005 per 1K requests
+- **Lambda (Location)**: ~$0.002 per 1K requests
+- **Bedrock**: ~$0.0001 per request
+- **IP Geolocation**: Free (30K requests/month)
 
-**Total estimated cost**: < $1/month
+**Total estimated cost**: < $5/month for 1,000 visitors/month
 
 ## 🔐 Security Best Practices
 
@@ -291,10 +311,34 @@ aws configure
 
 ## 📚 Additional Documentation
 
-- [Backend Documentation](./backend/README.md) - Detailed backend setup and API reference
+- [Backend Deployment Guide](./backend/DEPLOYMENT.md) - Step-by-step backend setup
+- [Backend README](./backend/README.md) - API reference and architecture
 - [Vite Documentation](https://vitejs.dev/) - Build tool documentation
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework documentation
 - [AWS SAM](https://docs.aws.amazon.com/serverless-application-model/) - Serverless deployment
+
+## 🎯 New Features
+
+### 🤖 Greeting Bot
+- **Auto-shows on first visit** (uses sessionStorage to track)
+- **Detects visitor location** using IP geolocation
+- **Personalized greeting** with city and country
+- **Floating button** in bottom-right corner for easy access
+- **Quick actions**: Open AI chat or explore portfolio
+- **Fully responsive** design matching portfolio aesthetic
+
+### 🌍 Location Detection
+- Uses free IP geolocation services (ipapi.co & ip-api.com)
+- Fallback support if primary service fails
+- Privacy-friendly (no tracking, only display)
+- Works in development and production
+- Handles local/private IPs gracefully
+
+### 💬 AI Chat Enhancement
+- Now integrated with API Gateway
+- Maintains backward compatibility with Lambda Function URL
+- Enhanced error handling
+- Better CORS configuration
 
 ## 📝 License
 
@@ -316,17 +360,30 @@ For questions or issues, please open an issue on GitHub.
 
 Built with ❤️ using TypeScript, Tailwind CSS, and AWS
 
-## Architecture Decisions
+## 🏗️ Architecture Decisions
 
-### Backend: Lambda Function URL vs API Gateway
+### API Gateway Integration
 
-This project deliberately uses **Lambda Function URL** instead of API Gateway because:
+This project now uses **API Gateway** with multiple Lambda functions:
 
-- ✅ **Free** - Zero cost vs $3.50 per million requests
-- ✅ **Faster** - Direct invocation without API Gateway overhead (~20-30ms faster)
-- ✅ **Simpler** - Less infrastructure to manage and monitor
-- ✅ **Sufficient** - Built-in CORS, HTTPS, and logging meet all portfolio needs
+**Benefits:**
+- ✅ **Single API** for multiple endpoints (/ai, /location)
+- ✅ **Better organization** - separate concerns into different Lambda functions
+- ✅ **Enhanced features** - built-in request/response transformation
+- ✅ **Production-ready** - better monitoring and logging
+- ✅ **Backward compatible** - Legacy Lambda Function URL still works
 
-For a detailed analysis and comparison, see [API Gateway Recommendation](./docs/API_GATEWAY_RECOMMENDATION.md).
+**Endpoints:**
+- `POST /ai` - AI-powered Q&A about the portfolio
+- `GET /location` - IP-based location detection
 
-**Bottom line:** Lambda Function URL is the right choice for portfolios and low-to-moderate traffic applications. API Gateway is only beneficial at high scale (100K+ requests/month) or when you need advanced features like API keys, custom domains, or response caching.
+For a detailed analysis, see [backend/DEPLOYMENT.md](./backend/DEPLOYMENT.md).
+
+### Greeting Bot Design
+
+The greeting bot follows these principles:
+- **Non-intrusive**: Shows once per session, can be easily dismissed
+- **Informative**: Tells visitors about your passion for experimentation
+- **Interactive**: Quick actions to AI chat or portfolio exploration
+- **Accessible**: Always available via floating button
+- **Performant**: Lazy-loaded, doesn't block page rendering
