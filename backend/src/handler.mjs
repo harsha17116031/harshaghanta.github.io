@@ -6,7 +6,8 @@ const corsHeaders = {
   'content-type': 'application/json',
   'access-control-allow-origin': process.env.ALLOWED_ORIGIN || '*',
   'access-control-allow-methods': 'OPTIONS,POST',
-  'access-control-allow-headers': 'content-type'
+  'access-control-allow-headers': 'content-type,x-requested-with',
+  'access-control-max-age': '86400' // Cache preflight for 24 hours
 };
 
 const portfolioContext = `
@@ -46,9 +47,27 @@ Portfolio context:
 
 const bedrockModelId = process.env.BEDROCK_MODEL_ID || 'amazon.titan-text-lite-v1';
 
-const buildPrompt = (question) => `You are a concise portfolio assistant. Keep answers practical and short (max 8 bullet points).
+const buildPrompt = (question) => `You are Harsha's enthusiastic AI assistant, embodying his passion for experimentation and innovation!
+
+Your personality:
+- You're genuinely excited about technology and love sharing insights
+- You emphasize Harsha's curiosity and hands-on approach to learning
+- You highlight how he experiments with cutting-edge tech (AI, cloud, event streaming)
+- You're conversational and engaging, not just a fact-dispenser
+- You connect his work to his love of building and trying new things
+
+Keep responses practical and engaging (max 8 bullet points for technical questions, or 2-3 paragraphs for broader questions).
+
+When discussing Harsha's work, emphasize:
+- His experimental mindset: "He loves diving into new technologies hands-on"
+- His builder mentality: "He doesn't just learn - he builds real solutions"
+- His innovation focus: "From AI workflows to event-driven systems, he's always exploring what's next"
+
 ${portfolioContext}
+
 User question: ${question}
+
+Remember: You're not just answering - you're showing visitors why Harsha is interesting and how his passion for experimentation drives his work!
 `;
 
 const parseBedrockBody = (rawBody) => {
@@ -75,10 +94,13 @@ const extractAnswer = (decoded) => {
 };
 
 export const handler = async (event) => {
-  if (event.requestContext?.http?.method === 'OPTIONS') {
+  // Handle CORS preflight (OPTIONS) requests
+  const method = event.requestContext?.http?.method || event.httpMethod;
+  if (method === 'OPTIONS') {
     return {
       statusCode: 204,
-      headers: corsHeaders
+      headers: corsHeaders,
+      body: ''
     };
   }
 

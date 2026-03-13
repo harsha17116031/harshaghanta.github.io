@@ -1,8 +1,29 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Portfolio AI assistant (Lambda + Bedrock)
+Description: Portfolio AI assistant with API Gateway (Lambda + Bedrock + Location Detection)
+
+Globals:
+  Api:
+    Cors:
+      AllowOrigins:
+        - https://harsha17116031.github.io
+      AllowMethods:
+        - GET
+        - POST
+        - OPTIONS
+      AllowHeaders:
+        - content-type
 
 Resources:
+  # API Gateway
+  PortfolioApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: PortfolioAPI
+      StageName: prod
+      Description: Portfolio API with AI and location detection
+
+  # AI Assistant Function (existing)
   PortfolioAiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -21,7 +42,35 @@ Resources:
             Action:
               - bedrock:InvokeModel
             Resource: '*'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref PortfolioApi
+            Path: /ai
+            Method: POST
 
+  # Location Detection Function (new)
+  LocationDetectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs20.x
+      Handler: src/location-handler.handler
+      CodeUri: ./
+      Timeout: 10
+      MemorySize: 128
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: https://harsha17116031.github.io
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref PortfolioApi
+            Path: /location
+            Method: GET
+
+  # Keep Legacy Lambda Function URL for backward compatibility
   PortfolioAiFunctionUrl:
     Type: AWS::Lambda::Url
     Properties:
@@ -45,6 +94,24 @@ Resources:
       FunctionUrlAuthType: NONE
 
 Outputs:
+  # Primary API Gateway URL (recommended)
+  ApiGatewayUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${PortfolioApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiUrl'
+
+  # AI endpoint via API Gateway
+  AiEndpoint:
+    Description: AI Assistant API endpoint
+    Value: !Sub 'https://${PortfolioApi}.execute-api.${AWS::Region}.amazonaws.com/prod/ai'
+
+  # Location endpoint via API Gateway
+  LocationEndpoint:
+    Description: Location Detection API endpoint
+    Value: !Sub 'https://${PortfolioApi}.execute-api.${AWS::Region}.amazonaws.com/prod/location'
+
+  # Legacy Function URL (for backward compatibility)
   PortfolioAiUrl:
-    Description: Public Lambda Function URL
+    Description: Legacy Lambda Function URL (deprecated - use API Gateway)
     Value: !GetAtt PortfolioAiFunctionUrl.FunctionUrl
