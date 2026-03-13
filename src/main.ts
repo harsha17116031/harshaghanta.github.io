@@ -57,7 +57,7 @@ if (!app) {
 }
 
 app.innerHTML = `
-  <main class="relative min-h-screen overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 text-gray-800">
+  <main class="relative min-h-screen overflow-hidden bg-amber-50 text-gray-800">
     <!-- Animated background orbs -->
     <div class="pointer-events-none absolute -left-24 top-24 h-96 w-96 rounded-full bg-coral-200/30 blur-3xl animate-pulse-slow"></div>
     <div class="pointer-events-none absolute -right-16 top-6 h-80 w-80 rounded-full bg-teal-200/30 blur-3xl animate-pulse-slower"></div>
@@ -67,7 +67,7 @@ app.innerHTML = `
     <nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/90 border-b border-gray-200 shadow-sm">
       <div class="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-8">
-          <h1 class="text-xl font-bold bg-gradient-to-r from-coral-600 to-teal-600 bg-clip-text text-transparent">HVR</h1>
+          <h1 class="text-xl font-bold text-coral-600">HVR</h1>
           <div class="hidden md:flex gap-6">
             <a href="#about" class="nav-link text-sm font-medium text-gray-700 hover:text-coral-600 transition">About</a>
             <a href="#experience" class="nav-link text-sm font-medium text-gray-700 hover:text-coral-600 transition">Experience</a>
@@ -76,7 +76,7 @@ app.innerHTML = `
           </div>
         </div>
         <div class="flex items-center gap-3">
-          <button id="ai-toggle-btn" class="px-4 py-2 rounded-full bg-gradient-to-r from-coral-500 to-teal-500 text-white text-sm font-semibold hover:from-coral-600 hover:to-teal-600 transition shadow-md hover:shadow-lg">
+          <button id="ai-toggle-btn" class="px-4 py-2 rounded-full bg-coral-500 text-white text-sm font-semibold hover:bg-coral-600 transition shadow-md hover:shadow-lg">
             💬 AI Chat
           </button>
           <a href="mailto:ghanta.17116031@gmail.com" class="hidden md:block px-4 py-2 rounded-full bg-gray-100 border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-200 transition">
@@ -141,7 +141,7 @@ app.innerHTML = `
             <p class="text-sm text-gray-600 mt-3">Feel free to explore my projects, experience, and don't hesitate to reach out!</p>
           </div>
           <div class="flex gap-3">
-            <button id="greeting-ai-btn" class="flex-1 px-4 py-2 rounded-full bg-gradient-to-r from-coral-500 to-teal-500 text-white text-sm font-semibold hover:from-coral-600 hover:to-teal-600 transition shadow-md">
+            <button id="greeting-ai-btn" class="flex-1 px-4 py-2 rounded-full bg-coral-500 text-white text-sm font-semibold hover:bg-coral-600 transition shadow-md">
               💬 Ask AI About Me
             </button>
             <button id="greeting-explore-btn" class="flex-1 px-4 py-2 rounded-full bg-gray-100 border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-200 transition">
@@ -153,7 +153,7 @@ app.innerHTML = `
     </div>
 
     <!-- Greeting Bot Floating Button (bottom-right corner) -->
-    <button id="greeting-float-btn" class="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-gradient-to-r from-coral-500 to-teal-500 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center">
+    <button id="greeting-float-btn" class="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-coral-500 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center">
       <span class="text-2xl">👋</span>
     </button>
 
@@ -166,7 +166,7 @@ app.innerHTML = `
         </span>
         Available for opportunities
       </div>
-      <h1 class="mb-6 bg-gradient-to-r from-coral-600 via-amber-600 to-teal-600 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent md:text-7xl">
+      <h1 class="mb-6 text-coral-600 text-5xl font-extrabold tracking-tight md:text-7xl">
         Harsha Vardhan Reddy
       </h1>
       <p class="mx-auto mb-4 max-w-2xl text-xl text-gray-700 md:text-2xl">
@@ -176,7 +176,7 @@ app.innerHTML = `
         Building scalable cloud solutions with expertise in React, Node.js, AWS, and modern DevOps practices.
       </p>
       <div class="mx-auto mt-8 flex flex-wrap justify-center gap-4">
-        <a href="#projects" class="px-6 py-3 rounded-full bg-gradient-to-r from-coral-500 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-coral-500/50 transition transform hover:scale-105">
+        <a href="#projects" class="px-6 py-3 rounded-full bg-coral-500 text-white font-semibold hover:shadow-lg hover:shadow-coral-500/50 transition transform hover:scale-105">
           View Projects
         </a>
         <a href="mailto:ghanta.17116031@gmail.com" class="px-6 py-3 rounded-full border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-50 transition transform hover:scale-105 shadow-sm">
@@ -258,10 +258,19 @@ app.innerHTML = `
                     <div class="flex items-center gap-3">
                       <span class="text-3xl">${project.icon}</span>
                       <div>
-                        <h3 class="text-xl font-bold text-coral-600 group-hover:text-teal-600 transition">${project.name}</h3>
+                        <h3 class="text-xl font-bold text-coral-600 group-hover:text-coral-700 transition">${project.name}</h3>
                         <p class="text-sm text-gray-600">${project.subtitle}</p>
                       </div>
                     </div>
+                  </div>
+                  <div class="mb-4 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-64">
+                    <iframe
+                      src="${project.url}"
+                      title="${project.name} preview"
+                      class="w-full h-full"
+                      sandbox="allow-scripts allow-same-origin allow-forms"
+                      loading="lazy"
+                    ></iframe>
                   </div>
                   <p class="mb-4 text-gray-700">${project.summary}</p>
                   <div class="mb-4 flex flex-wrap gap-2">
@@ -335,12 +344,12 @@ app.innerHTML = `
         <span class="gradient-pill mb-6 inline-block">Education</span>
         <h2 class="section-title mb-6">Academic Background</h2>
         <div class="grid md:grid-cols-2 gap-6">
-          <div class="rounded-xl border border-coral-200 bg-gradient-to-br from-coral-50 to-amber-50 p-6 shadow-sm">
+          <div class="rounded-xl border border-coral-200 bg-coral-50 p-6 shadow-sm">
             <h3 class="text-lg font-bold text-gray-900">MS in Computer Science</h3>
             <p class="text-gray-700 mt-1">University of Texas at Dallas</p>
             <p class="text-sm text-gray-600 mt-2">2022 - 2023</p>
           </div>
-          <div class="rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 p-6 shadow-sm">
+          <div class="rounded-xl border border-teal-200 bg-teal-50 p-6 shadow-sm">
             <h3 class="text-lg font-bold text-gray-900">BTech in Information Technology</h3>
             <p class="text-gray-700 mt-1">NIT Raipur, India</p>
             <p class="text-sm text-gray-600 mt-2">2016 - 2020</p>
@@ -494,8 +503,6 @@ const greetingAiBtn = document.querySelector<HTMLButtonElement>('#greeting-ai-bt
 const greetingExploreBtn = document.querySelector<HTMLButtonElement>('#greeting-explore-btn');
 const greetingLocationEl = document.querySelector<HTMLParagraphElement>('#greeting-location');
 
-const GREETING_STORAGE_KEY = 'portfolio_greeting_shown';
-
 const closeGreetingModal = (): void => {
   if (greetingModal) {
     greetingModal.classList.add('hidden');
@@ -552,27 +559,7 @@ const fetchAndDisplayLocation = async (): Promise<void> => {
   }
 };
 
-// Check if greeting should be shown (first visit in this session)
-const shouldShowGreeting = (): boolean => {
-  return !sessionStorage.getItem(GREETING_STORAGE_KEY);
-};
-
-// Mark greeting as shown
-const markGreetingShown = (): void => {
-  sessionStorage.setItem(GREETING_STORAGE_KEY, 'true');
-};
-
-// Auto-show greeting on first visit
-if (shouldShowGreeting()) {
-  // Fetch location first
-  void fetchAndDisplayLocation();
-
-  // Show greeting after a short delay (for better UX)
-  setTimeout(() => {
-    showGreetingModal();
-    markGreetingShown();
-  }, 1500);
-}
+// Removed auto-show greeting - user can access via floating button
 
 // Event listeners for greeting bot
 if (greetingFloatBtn) {
